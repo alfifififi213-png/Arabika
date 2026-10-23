@@ -1,0 +1,1 @@
+export default function handler(req,res){res.setHeader('Cache-Control','no-store');return res.status(200).json({configured:Boolean(process.env.OPENAI_API_KEY),accessCodeRequired:Boolean(process.env.AI_ACCESS_CODE)})}

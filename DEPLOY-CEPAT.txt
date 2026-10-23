@@ -1,0 +1,6 @@
+1. Ekstrak ZIP.
+2. Upload ISI folder arabika ke root repository GitHub.
+3. Impor repo di Vercel. Framework Other, Build npm run build, Output dist.
+4. Tambahkan OPENAI_API_KEY. Opsional AI_ACCESS_CODE untuk membatasi akses.
+5. Deploy. Masukkan kode akses di Pengaturan website jika diaktifkan.
+Panduan lengkap: README.md.
