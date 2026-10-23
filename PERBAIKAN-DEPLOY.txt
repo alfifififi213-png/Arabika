@@ -1,0 +1,7 @@
+GANTI ISI REPOSITORY DENGAN ISI ZIP INI.
+Hapus server.mjs lama di root repository.
+Pastikan package.json dan vercel.json berada langsung di root repository.
+Vercel: Framework Other; Node 22.x; Build npm run build; Output dist.
+Root Directory menunjuk folder berisi package.json.
+Redeploy tanpa build cache.
+Jika tetap 500, kirim Runtime Logs (stack trace) dan URL deployment.

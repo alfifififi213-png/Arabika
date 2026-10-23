@@ -58,7 +58,7 @@ Rekaman berada di memori browser dan dikirim ke OpenAI hanya saat tombol transkr
 - `public/lessons.js`: sumber materi; ubah di sini untuk menambah tema.
 - `api/ai.js`: tutor, koreksi, dan transkripsi menggunakan API server-side.
 - `api/status.js`: status konfigurasi tanpa membocorkan key.
-- `server.mjs`: server pengembangan dengan endpoint yang sama.
+- `scripts/dev-server.mjs`: server pengembangan dengan endpoint yang sama.
 - `build.mjs`: menyalin aset ke dist.
 - `tests/api.test.js`: validasi input, kode akses, dan pengujian kontrak dengan upstream simulasi.
 
@@ -88,3 +88,6 @@ Kode akses merupakan pembatas sederhana, bukan autentikasi per pengguna atau rat
 - Mikrofon ditolak: izinkan pada pengaturan situs dan gunakan HTTPS.
 - Tidak ada suara Arab: pasang paket suara Arab pada sistem lalu muat ulang.
 - Halaman 404: periksa Root Directory dan pastikan isi proyek berada di sana.
+
+## Pembaruan deployment 1.0.1
+ZIP perbaikan berisi file proyek langsung di root. Gunakan Framework Other, Node 22.x, Output dist. Hapus server.mjs lama dari root repository; server lokal dipindah ke scripts/dev-server.mjs. Jika 500 tetap muncul, buka deployment → Runtime Logs dan ambil stack trace; screenshot 500 saja belum menentukan penyebab.

@@ -1,14 +1,14 @@
 {
   "name": "arabika",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node server.mjs",
+    "dev": "node scripts/dev-server.mjs",
     "build": "node build.mjs",
     "test": "node --test"
   },
   "engines": {
-    "node": ">=22"
+    "node": "22.x"
   }
 }
