@@ -1,0 +1,21 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import handler from '../api/auth.js';import ai from '../api/ai.js';import {sameOrigin,setSession,sessionUser} from '../lib/auth.js';
+const res=()=>({headers:{},code:200,setHeader(k,v){this.headers[k]=v},getHeader(k){return this.headers[k]},status(c){this.code=c;return this},json(d){this.data=d;return this}});
+const request=(action,extra={})=>({method:'POST',headers:{host:'arabika.test',origin:'https://arabika.test','x-forwarded-proto':'https'},body:{action,...extra}});
+test('same-origin rejects cross-site and missing origin',()=>{assert.equal(sameOrigin(request('login')),true);assert.equal(sameOrigin({headers:{host:'arabika.test',origin:'https://evil.test'}}),false);assert.equal(sameOrigin({headers:{host:'arabika.test'}}),false)});
+test('auth flow and server enforcement',async()=>{const original={...process.env},oldFetch=global.fetch;process.env.AUTH_ENABLED='true';delete process.env.SUPABASE_URL;delete process.env.SUPABASE_PUBLISHABLE_KEY;try{
+let r=res();await handler({method:'GET',headers:{}},r);assert.equal(r.data.configured,false);
+r=res();await ai(request('chat',{text:'مرحبا'}),r);assert.equal(r.code,503);assert.match(r.data.error,/Login/);
+process.env.SUPABASE_URL='https://project.supabase.co';process.env.SUPABASE_PUBLISHABLE_KEY='public-test';
+r=res();await ai(request('chat',{text:'مرحبا'}),r);assert.equal(r.code,401);assert.equal(r.data.code,'LOGIN_REQUIRED');
+r=res();const bad=request('login');bad.headers.origin='https://evil.test';await handler(bad,r);assert.equal(r.code,403);
+r=res();await handler(request('signup',{email:'a@example.com',password:'short',name:'A'}),r);assert.equal(r.code,400);
+let calls=[];global.fetch=async(url,opts)=>{calls.push({url,opts});if(url.endsWith('/token?grant_type=password'))return {ok:true,status:200,json:async()=>({access_token:'access',refresh_token:'refresh',user:{id:'user-1',email:'a@example.com',user_metadata:{name:'A'}}})};if(url.endsWith('/user'))return {ok:true,status:200,json:async()=>({id:'user-1',email:'a@example.com'})};if(url.includes('/recover'))return {ok:true,status:200,json:async()=>({})};return {ok:false,status:400,json:async()=>({})}};
+r=res();await handler(request('login',{email:'a@example.com',password:'password'}),r);assert.equal(r.data.user.id,'user-1');assert.equal('access_token'in r.data,false);assert.equal(r.headers['Cache-Control'],'no-store');assert.ok(r.headers['Set-Cookie'].every(c=>c.includes('HttpOnly')&&c.includes('Secure')&&c.includes('SameSite=Lax')));
+r=res();await handler({method:'GET',headers:{cookie:'arabika_access=access'}},r);assert.equal(r.data.user.id,'user-1');
+r=res();await handler(request('recover',{email:'a@example.com'}),r);assert.match(r.data.message,/Jika email terdaftar/);assert.ok(calls.some(c=>c.url.includes('redirect_to=https%3A%2F%2Farabika.test%2F')));
+global.fetch=async(url)=>url.endsWith('/user')?{ok:false,status:401,json:async()=>({})}:{ok:true,status:200,json:async()=>({access_token:'renewed',refresh_token:'new-refresh',user:{id:'user-1'}})};
+r=res();const u=await sessionUser({headers:{cookie:'arabika_access=expired; arabika_refresh=refresh'}},r);assert.equal(u.id,'user-1');assert.match(r.headers['Set-Cookie'][0],/renewed/);
+global.fetch=async()=>({ok:false,status:401,json:async()=>({})});r=res();assert.equal(await sessionUser({headers:{cookie:'arabika_access=forged'}},r),null);assert.match(r.headers['Set-Cookie'][0],/Max-Age=0/);
+r=res();await handler(request('logout'),r);assert.equal(r.data.ok,true);assert.match(r.headers['Set-Cookie'][1],/Max-Age=0/);
+}finally{global.fetch=oldFetch;for(const k of ['AUTH_ENABLED','SUPABASE_URL','SUPABASE_PUBLISHABLE_KEY']){if(original[k]===undefined)delete process.env[k];else process.env[k]=original[k]}}});

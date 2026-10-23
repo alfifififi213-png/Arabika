@@ -1,6 +1,7 @@
-1. Ekstrak ZIP.
-2. Upload ISI folder arabika ke root repository GitHub.
-3. Impor repo di Vercel. Framework Other, Build npm run build, Output dist.
-4. Tambahkan OPENAI_API_KEY. Opsional AI_ACCESS_CODE untuk membatasi akses.
-5. Deploy. Masukkan kode akses di Pengaturan website jika diaktifkan.
-Panduan lengkap: README.md.
+Versi 1.2 — Baca PANDUAN-LOGIN.md sebelum deploy.
+Login membutuhkan SUPABASE_URL dan SUPABASE_PUBLISHABLE_KEY pada Vercel.
+Pertahankan OPENAI_API_KEY yang sudah bekerja.
+Upload isi proyek ke root repo. Framework Other, Node 22.x, Build npm run build, Output dist.
+Siapkan Site URL, Redirect URLs, Email/SMTP di Supabase.
+Mode pemulihan sementara: AUTH_ENABLED=false lalu redeploy (login dinonaktifkan).
+Backup sumber sebelum login ada dalam folder BACKUP.

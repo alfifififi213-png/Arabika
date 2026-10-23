@@ -1,0 +1,3 @@
+Versi 1.2 mencakup dashboard baru DAN autentikasi.
+Jangan mengikuti instruksi lama yang hanya mengganti empat file.
+Ikuti PANDUAN-LOGIN.md untuk pembaruan lengkap dan konfigurasi Supabase.
